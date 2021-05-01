@@ -4,22 +4,21 @@ import (
 	"fmt"
 
 	"github.com/filecoin-project/go-address"
-	 "github.com/filecoin-project/go-crypto"
-	 crypto2 "github.com/filecoin-project/go-state-types/crypto"
+	"github.com/filecoin-project/go-crypto"
+	crypto2 "github.com/filecoin-project/go-state-types/crypto"
 	"github.com/minio/blake2b-simd"
 
 	"github.com/filecoin-project/lotus/chain/types"
-	"github.com/filecoin-project/lotus/lib/sigs"
+	sigs2 "github.com/filecoin-project/lotus/lib/sigs"
 
 	"golang.org/x/xerrors"
-
 )
 
 type KeyType string
 type secpSigner struct{}
 
-func (secpSigner) GenPrivate() ([]byte, error) {
-	priv, err := crypto.GenerateKey()
+func (secpSigner) GenPrivate() (*Key, error) {
+	priv, err := GenerateKey()
 	if err != nil {
 		return nil, err
 	}
@@ -28,8 +27,8 @@ func (secpSigner) GenPrivate() ([]byte, error) {
 
 func GenerateKey() (*Key, error) {
 	ctyp := crypto2.SigTypeSecp256k1
-	pk, err := sigs.Generate(ctyp)
-	if err != nil{
+	pk, err := sigs2.Generate(ctyp)
+	if err != nil {
 		return nil, err
 	}
 
@@ -46,16 +45,16 @@ func NewKey(keyinfo types.KeyInfo) (*Key, error) {
 	}
 
 	var err error
-	k.PublicKey, err = sigs.ToPublic(ActSigType(k.Type), k.PrivateKey)
+	k.PublicKey, err = sigs2.ToPublic(ActSigType(k.Type), k.PrivateKey)
 	if err != nil {
 		return nil, err
 	}
 
 	k.Address, err = address.NewSecp256k1Address(k.PublicKey)
-	if err != nil{
-		return nil, xerrors.Errorf("converting Secp256k1 to address: %w",err)
+	if err != nil {
+		return nil, xerrors.Errorf("converting Secp256k1 to address: %w", err)
 	}
-	return k,nil
+	return k, nil
 }
 
 type Key struct {
@@ -96,7 +95,6 @@ func (secpSigner) Verify(sig []byte, a address.Address, msg []byte) error {
 
 	return nil
 }
-
 
 func ActSigType(typ types.KeyType) crypto2.SigType {
 	switch typ {
