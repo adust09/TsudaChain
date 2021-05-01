@@ -1,8 +1,10 @@
 # TsudaChain
 ## なにこれ？
-TsudachainはFilecoinを参考にGolangでブロックチェーンを実装しようという試みです
+TsudachainはFilecoinを参考にGolangで簡易ブロックチェーンを実装しようという試みです
 
 ## どんなの？
+p2pの通信に関しては技術力がないのでたぶんやりません。
+アドレス生成、トランザクションの作成、ブロックの生成までができれば満足です
 |    |Filecoin    |Tsudachain|
 | ---- | ---- |---- |
 |  コンセンサス  |  PoR & PoST  |PoW|
