@@ -1,4 +1,4 @@
-package secp256k1
+package sigs
 
 import (
 	"context"
@@ -12,23 +12,12 @@ import (
 	"github.com/filecoin-project/lotus/chain/types"
 )
 
-// SigShim is used for introducing signature functions
-
-type SigShim interface {
-	GenPrivate() ([]byte, error)
-	ToPublic(pk []byte) ([]byte, error)
-	Sign(pk []byte, msg []byte) ([]byte, error)
-	Verify(sig []byte, a address.Address, msg []byte) error
-}
-
-var sigs map[crypto2.SigType]SigShim
-
 // Sign takes in signature type, private key and message. Returns a signature for that message.
 // Valid sigTypes are: "secp256k1" and "bls"
-func Sign(sigType crypto2.SigType, privkey []byte, msg []byte) (*crypto2.Signature, error) {
-	sv, ok := sigs[sigType]
+func Sign(privkey []byte, msg []byte) (*crypto2.Signature, error) {
+	sv, ok := sigs[crypto2.SigTypeSecp256k1]
 	if !ok {
-		return nil, fmt.Errorf("cannot sign message with signature of unsupported type: %v", sigType)
+		return nil, fmt.Errorf("cannot sign message with signature of unsupported type: %v", crypto2.SigTypeSecp256k1)
 	}
 
 	sb, err := sv.Sign(privkey, msg)
@@ -36,7 +25,7 @@ func Sign(sigType crypto2.SigType, privkey []byte, msg []byte) (*crypto2.Signatu
 		return nil, err
 	}
 	return &crypto2.Signature{
-		Type: sigType,
+		Type: crypto2.SigTypeSecp256k1,
 		Data: sb,
 	}, nil
 }
@@ -60,20 +49,20 @@ func Verify(sig *crypto2.Signature, addr address.Address, msg []byte) error {
 }
 
 // Generate generates private key of given type
-func Generate(sigType crypto2.SigType) ([]byte, error) {
-	sv, ok := sigs[sigType]
+func Generate() ([]byte, error) {
+	sv, ok := sigs[crypto2.SigTypeSecp256k1]
 	if !ok {
-		return nil, fmt.Errorf("cannot generate private key of unsupported type: %v", sigType)
+		return nil, fmt.Errorf("cannot generate private key of unsupported type: %v", crypto2.SigTypeSecp256k1)
 	}
 
 	return sv.GenPrivate()
 }
 
 // ToPublic converts private key to public key
-func ToPublic(sigType crypto2.SigType, pk []byte) ([]byte, error) {
-	sv, ok := sigs[sigType]
+func ToPublic(pk []byte) ([]byte, error) {
+	sv, ok := sigs[crypto2.SigTypeSecp256k1]
 	if !ok {
-		return nil, fmt.Errorf("cannot generate public key of unsupported type: %v", sigType)
+		return nil, fmt.Errorf("cannot generate public key of unsupported type: %v", crypto2.SigTypeSecp256k1)
 	}
 
 	return sv.ToPublic(pk)
@@ -104,10 +93,21 @@ func CheckBlockSignature(ctx context.Context, blk *types.BlockHeader, worker add
 	return err
 }
 
+// SigShim is used for introducing signature functions
+
+type SigShim interface {
+	GenPrivate() ([]byte, error)
+	ToPublic(pk []byte) ([]byte, error)
+	Sign(pk []byte, msg []byte) ([]byte, error)
+	Verify(sig []byte, a address.Address, msg []byte) error
+}
+
+var sigs map[crypto2.SigType]SigShim
+
 // RegisterSignature should be only used during init
-func RegisterSignature(typ crypto2.SigType, vs SigShim) {
+func RegisterSignature(vs SigShim) {
 	if sigs == nil {
 		sigs = make(map[crypto2.SigType]SigShim)
 	}
-	sigs[typ] = vs
+	sigs[crypto2.SigTypeSecp256k1] = vs
 }
