@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+option go_package = "github.com/adust09/Tsudachain/blockchain";
+package proto;
+
+// The blockchain service definition
+service Blockchain {
+    // Sends a AddBlockRequest Return AddBlockResponse
+    rpc AddBlock(AddBlockRequest) returns (AddBlockResponse) {}
+    rpc GetBlockChain(GetBlockchainRequest) returns (GetBlockchainResponse) {}
+}
+
+// The request AddBlockRequest containing the data
+message AddBlockRequest {
+    string data = 1;
+}
+
+// The request AddBlockResponse containing the hash
+message AddBlockResponse {
+    string hash = 1;
+}
+
+message GetBlockchainRequest {}
+
+message Block {
+    string hash = 1;
+    string prevBlockHash = 2;
+    string data = 3;
+}
+
+message GetBlockchainResponse {
+    repeated Block blocks = 1;
+}
