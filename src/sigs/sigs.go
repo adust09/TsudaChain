@@ -94,7 +94,6 @@ func CheckBlockSignature(ctx context.Context, blk *types.BlockHeader, worker add
 }
 
 // SigShim is used for introducing signature functions
-
 type SigShim interface {
 	GenPrivate() ([]byte, error)
 	ToPublic(pk []byte) ([]byte, error)

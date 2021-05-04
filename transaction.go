@@ -1,24 +1,23 @@
-//アドレスを定義しておき、インポートする形にしたい
 
 import(
-	"fmt"
-	"math/rand"
+"fmt"
+"math/rand"
 )
 
 type accountInfo{
-	address  := ""
-	value  := 0
+address := ""
+value := 0
 }
 
 func main(){
-	 address := new(accountInfo)
+address := new(accountInfo)
 }
 
 func makeTransaction(){
-	to := new(accountInfo)
+to := new(accountInfo)
 
-	if to.value == null
-	fmt.Print("to.address has no value")
+if to.value == null
+fmt.Print("to.address has no value")
 
 
 }
